@@ -12,7 +12,7 @@
                     <span class="badge text-bg-primary">{{ listing.category|upper }}</span>
                     <p class="card-text">{{ listing.description }}</p>
                     <p>Price: ${{ listing.price }}</p>
-                    <a href="{% url 'listing' listing_id=listing.id %}" class="btn btn-primary mt-auto">See more</a>
+                    <a href="{% url 'listing' id=listing.id %}" class="btn btn-primary mt-auto">See more</a>
                 </div>
             </div>
         {% endfor %}

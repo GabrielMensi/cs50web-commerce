@@ -92,12 +92,10 @@ def create_listing(request):
         )
         listing.save()
         return HttpResponseRedirect(reverse("index"))
-    
 
-def listing(request):
-    # listing_id = request.GET.get("listing_id")
-    # listing = Listing.objects.get(primary_key=listing_id)
-    print(request.GET)
+
+def listing(request, id):
+    listing = Listing.objects.get(id=id)
     return render(request, "auctions/listing.html", {
         "listing": listing
     })
