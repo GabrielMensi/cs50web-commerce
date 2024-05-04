@@ -13,7 +13,8 @@ class Category(models.Model):
         return self.name
 
 
-class listing(models.Model):
+class Listing(models.Model):
+    id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=64)
     description = models.CharField(max_length=256)
     price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -32,3 +33,20 @@ class listing(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Comments(models.Model):
+    comment = models.CharField(max_length=256)
+    listing = models.ForeignKey(
+        Listing,
+        on_delete=models.CASCADE,
+        related_name="listing_comments"
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="user_comments"
+    )
+
+    def __str__(self):
+        return self.comment
