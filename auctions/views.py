@@ -115,16 +115,17 @@ def listing(request, id):
 
 def displayCategory(request):
     if request.method == "POST":
-        category = Category.objects.get(request.POST["category"])
-    listings = Listing.objects.filter(active=True, category=category)
-    categories = Category.objects.all()
-    return render(
-        request,
-        "auctions/index.html",
-        {
-            "listings": listings,
-            "categories": categories
-        })
+        category_name = request.POST["category"]
+        category = Category.objects.get(name=category_name)
+        listings = Listing.objects.filter(active=True, category=category)
+        categories = Category.objects.all()
+        return render(
+            request,
+            "auctions/index.html",
+            {
+                "listings": listings,
+                "categories": categories
+            })
 
 
 def removeWatchlist(request, id):
