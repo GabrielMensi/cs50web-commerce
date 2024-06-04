@@ -1,19 +1,21 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User, Category, Listing
+from .models import User, Category, Listing, Comments, Bid
 
 
 def index(request):
-    listings = Listing.objects.all()
+    listings = Listing.objects.filter(active=True)
+    categories = Category.objects.all()
     return render(
         request,
         "auctions/index.html",
         {
-            "listings": listings
+            "listings": listings,
+            "categories": categories
         })
 
 
@@ -78,17 +80,19 @@ def create_listing(request):
     else:
         title = request.POST["title"]
         description = request.POST["description"]
-        price = request.POST["price"]
         image = request.POST["image"]
         category = Category.objects.get(name=request.POST["category"])
         owner = request.user
+        bid = float(request.POST["price"])
+        price = Bid(bid=bid, user=owner)
+        price.save()
         listing = Listing(
             title=title,
             description=description,
-            price=price,
             image=image,
             category=category,
-            owner=owner
+            owner=owner,
+            price=price
         )
         listing.save()
         return HttpResponseRedirect(reverse("index"))
@@ -96,6 +100,105 @@ def create_listing(request):
 
 def listing(request, id):
     listing = Listing.objects.get(id=id)
+    isListingInWatchlist = request.user in listing.watchlist.all()
+    comments = listing.listing_comments.all()
+    isOwner = request.user == listing.owner
     return render(request, "auctions/listing.html", {
-        "listing": listing
+        "listing": listing,
+        "isListingInWatchlist": isListingInWatchlist,
+        "comments": comments,
+        "isOwner": isOwner
+    })
+
+
+def displayCategory(request):
+    if request.method == "POST":
+        category = Category.objects.get(request.POST["category"])
+    listings = Listing.objects.filter(active=True, category=category)
+    categories = Category.objects.all()
+    return render(
+        request,
+        "auctions/index.html",
+        {
+            "listings": listings,
+            "categories": categories
+        })
+
+
+def removeWatchlist(request, id):
+    listing = Listing.objects.get(id=id)
+    user = request.user
+    listing.watchlist.remove(user)
+    return HttpResponseRedirect(reverse("listing", args=(id,)))
+
+
+def addWatchlist(request, id):
+    listing = Listing.objects.get(id=id)
+    user = request.user
+    listing.watchlist.add(user)
+    return HttpResponseRedirect(reverse("listing", args=(id,)))
+
+
+def watchlist(request):
+    listings = request.user.watchlist_listings.all()
+    return render(request, "auctions/watchlist.html", {
+        "listings": listings
+    })
+
+
+def addComment(request, id):
+    listing = Listing.objects.get(id=id)
+    user = request.user
+    comment = request.POST["comment"]
+    comment = Comments(
+        comment=comment,
+        listing=listing,
+        user=user
+    )
+    comment.save()
+    return HttpResponseRedirect(reverse("listing", args=(id,)))
+
+
+def addBid(request, id):
+    listing = Listing.objects.get(id=id)
+    bid = float(request.POST["bid"])
+    comments = listing.listing_comments.all()
+    isListingInWatchlist = request.user in listing.watchlist.all()
+    isOwner = request.user == listing.owner
+    if bid > listing.price.bid:
+        listing.price.bid = bid
+        listing.price.save()
+        return render(request, "auctions/listing.html", {
+            "listing": listing,
+            "message": "success bid",
+            "update": True,
+            "comments": comments,
+            "isListingInWatchlist": isListingInWatchlist,
+            "isOwner": isOwner
+        })
+    else:
+        return render(request, "auctions/listing.html", {
+            "listing": listing,
+            "message": "bid must be greater than current bid",
+            "update": False,
+            "comments": comments,
+            "isListingInWatchlist": isListingInWatchlist,
+            "isOwner": isOwner
+        })
+
+
+def closeAuction(request, id):
+    listing = Listing.objects.get(id=id)
+    listing.active = False
+    listing.save()
+    comments = listing.listing_comments.all()
+    isListingInWatchlist = request.user in listing.watchlist.all()
+    isOwner = request.user == listing.owner
+    return render(request, "auctions/listing.html", {
+            "listing": listing,
+            "message": "Auction closed successfully",
+            "update": True,
+            "comments": comments,
+            "isListingInWatchlist": isListingInWatchlist,
+            "isOwner": isOwner
     })
