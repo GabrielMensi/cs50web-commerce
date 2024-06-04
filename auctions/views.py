@@ -141,6 +141,7 @@ def addWatchlist(request, id):
     return HttpResponseRedirect(reverse("listing", args=(id,)))
 
 
+@login_required(login_url="login")
 def watchlist(request):
     listings = request.user.watchlist_listings.all()
     return render(request, "auctions/watchlist.html", {
