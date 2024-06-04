@@ -13,11 +13,26 @@ class Category(models.Model):
         return self.name
 
 
+class Bid(models.Model):
+    bid = models.DecimalField(max_digits=10, decimal_places=2)
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="user_bids"
+    )
+
+
 class Listing(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=64)
     description = models.CharField(max_length=256)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.ForeignKey(
+        Bid,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        related_name="price_listings"
+    )
     image = models.URLField(blank=True)
     active = models.BooleanField(default=True)
     category = models.ForeignKey(
@@ -29,6 +44,11 @@ class Listing(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name="user_listings"
+    )
+    watchlist = models.ManyToManyField(
+        User,
+        blank=True,
+        related_name="watchlist_listings"
     )
 
     def __str__(self):
@@ -49,4 +69,4 @@ class Comments(models.Model):
     )
 
     def __str__(self):
-        return self.comment
+        return f"{self.user} commented on {self.listing}"
