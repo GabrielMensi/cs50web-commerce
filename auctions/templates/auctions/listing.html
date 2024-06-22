@@ -2,7 +2,7 @@
 
 {% block body %}
 
-    {% if message %}
+    {% if message and listing.owner.username == user.username %}
         {% if update %}
             <div class="alert alert-success" role="alert">
                 {{ message }}
@@ -13,8 +13,8 @@
             </div>
         {% endif %}
     {% endif %}
-
-    {% if not listing.active and user == listing.price.user %}
+            {{listing.owner.username}}
+    {% if not listing.active and user.username == listing.price.user %}
         <div>
             <div class="alert alert-success" role="alert">
                 You won the auction!
@@ -58,16 +58,16 @@
                         {% csrf_token %}
                         <div class="form-group">
                             <label for="comment">Add Bid</label>
-                            <input type="number" class="form-control" id="bid" name="bid" min="{{listing.price.bid}}">
+                            <input type="number" class="form-control" id="bid" name="bid" min="{{listing.price.bid|add:1}}" value="{{listing.price.bid|add:1}}">
                         </div>
                         <button type="submit" class="btn btn-primary mt-2">Publish new Bid</button>
                     </form>
                 {% endif %}
-                <h5 class="card-title">Details</h5>
+                <h5 class="card-title mt-4">Details</h5>
                 <ul class="list-group list-group-flush">
                     <li class="list-group item">Created by: {{ listing.owner }}</li>
                     <li class="list-group item">Category: {% if listing.category %} {{ listing.category|capfirst }} {% else %}no listed{% endif %}</li>
-                    <li class="list-group item">Status: {{ listing.status }}</li>
+                    <li class="list-group item">Status: {% if listing.active %}Active{% else %}Closed{% endif %}</li>
                 </ul>
             </div>
         </div>
