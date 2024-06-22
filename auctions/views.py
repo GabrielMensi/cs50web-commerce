@@ -85,17 +85,24 @@ def create_listing(request):
         image = request.POST["image"]
         category = Category.objects.get(name=request.POST["category"])
         owner = request.user
-        bid = float(request.POST["price"])
-        price = Bid(bid=bid, user=owner)
-        price.save()
+
+        # Primero creamos el Listing sin el precio inicial
         listing = Listing(
             title=title,
             description=description,
             image=image,
             category=category,
-            owner=owner,
-            price=price
+            owner=owner
         )
+        listing.save()
+
+        # Luego creamos el Bid y lo asociamos al Listing
+        bid_amount = float(request.POST["price"])
+        bid = Bid(bid=bid_amount, user=owner, listing=listing)
+        bid.save()
+
+        # Asignamos el Bid creado como el precio inicial del Listing
+        listing.price = bid
         listing.save()
         return HttpResponseRedirect(reverse("index"))
 

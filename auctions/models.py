@@ -20,6 +20,14 @@ class Bid(models.Model):
         on_delete=models.CASCADE,
         related_name="user_bids"
     )
+    listing = models.ForeignKey(
+        "Listing",
+        on_delete=models.CASCADE,
+        related_name="listing_bids"
+    )
+
+    def __str__(self):
+        return f"{self.user} bid {self.bid} on {self.listing}"
 
 
 class Listing(models.Model):
