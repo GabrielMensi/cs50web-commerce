@@ -63,7 +63,7 @@ class Listing(models.Model):
         return self.title
 
 
-class Comments(models.Model):
+class Comment(models.Model):
     comment = models.CharField(max_length=256)
     listing = models.ForeignKey(
         Listing,
