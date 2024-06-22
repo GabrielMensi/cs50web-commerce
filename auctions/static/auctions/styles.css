@@ -3,3 +3,24 @@ body {
     background-color: #1c1c1c;
     color: #fff;
 }
+
+.navbar-brand, .nav-link {
+    color: #fff !important;
+    margin-bottom: 0;
+}
+
+.--username > strong{
+    color: var(--bs-success) !important;
+}
+
+.--brand {
+    color: var(--bs-primary) !important;
+}
+
+.--logout {
+    color: var(--bs-danger) !important;
+}
+
+.form-floating > label {
+    color: rgba(var(--bs-body-color-rgb), .65);
+}
