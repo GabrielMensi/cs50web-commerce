@@ -1,0 +1,10 @@
+<article class="card " style="width: 18rem; ">
+    <img src="{{ image }}" class="card-img-top" alt="Image of {{ title }}">
+    <div class="card-body">
+        <h5 class="card-title">{{ title }}</h5>
+        <span class="badge text-bg-primary">{{ category|upper }}</span>
+        <p class="card-text">{{ description }}</p>
+        <p>Price: ${{ price.bid|floatformat:"2g" }}</p>
+        <a href="{% url 'listing' id=id %}" class="btn btn-primary mt-auto">See more</a>
+    </div>
+</article>
