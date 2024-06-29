@@ -25,6 +25,7 @@
     <h2>Listing</h2>
 
     <div class="d-flex gap-3">
+
         <div class="card w-50">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5>{{ listing.title }}</h5>
@@ -65,9 +66,30 @@
                 {% endif %}
                 <h5 class="card-title mt-4">Details</h5>
                 <ul class="list-group list-group-flush">
-                    <li class="list-group item">Created by: {{ listing.owner }}</li>
-                    <li class="list-group item">Category: {% if listing.category %} {{ listing.category|capfirst }} {% else %}no listed{% endif %}</li>
-                    <li class="list-group item">Status: {% if listing.active %}Active{% else %}Closed{% endif %}</li>
+                    <li class="list-group item d-flex flex-row gap-1">
+                        <strong>Created by:</strong>
+                        {{ listing.owner }}
+                    </li>
+                    <li class="list-group item d-flex flex-row gap-1">
+                        <strong>Category:</strong> 
+                        {% if listing.category %} 
+                            {{ listing.category|capfirst }}
+                        {% else %}
+                            no listed
+                        {% endif %}
+                    </li>
+                    <li class="list-group item d-flex flex-row gap-1">
+                        <strong>Status:</strong> 
+                        {% if listing.active %}
+                            Active
+                        {% else %}
+                            Closed
+                        {% endif %}
+                    </li>
+                    <li class="list-group item d-flex flex-row gap-1">
+                        <strong>Date:</strong> 
+                        {{ listing.created_at|date:"F j" }} 
+                    </li>
                 </ul>
             </div>
         </div>
