@@ -101,11 +101,13 @@ def listing(request, id):
     isListingInWatchlist = request.user in listing.watchlist.all()
     comments = listing.listing_comments.all()
     isOwner = request.user == listing.owner
+    categories = Category.objects.all()
     return render(request, "auctions/listing.html", {
         "listing": listing,
         "isListingInWatchlist": isListingInWatchlist,
         "comments": comments,
-        "isOwner": isOwner
+        "isOwner": isOwner,
+        "categories": categories
     })
 
 
