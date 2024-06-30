@@ -33,7 +33,13 @@ def login_view(request):
                 "message": "Invalid username and/or password."
             })
     else:
-        return render(request, "auctions/login.html")
+        categories = Category.objects.all()
+        return render(
+            request,
+            "auctions/login.html",
+            {
+                "categories": categories
+            })
 
 
 def logout_view(request):
@@ -61,7 +67,13 @@ def register(request):
         login(request, user)
         return HttpResponseRedirect(reverse("index"))
     else:
-        return render(request, "auctions/register.html")
+        categories = Category.objects.all()
+        return render(
+            request,
+            "auctions/register.html",
+            {
+                "categories": categories
+            })
 
 
 @login_required(login_url="login")
@@ -145,8 +157,10 @@ def add_watchlist(request, id):
 @login_required(login_url="login")
 def watchlist(request):
     listings = request.user.watchlist_listings.all()
+    categories = Category.objects.all()
     return render(request, "auctions/watchlist.html", {
-        "listings": listings
+        "listings": listings,
+        "categories": categories
     })
 
 
