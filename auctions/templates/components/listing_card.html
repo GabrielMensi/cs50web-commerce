@@ -1,0 +1,67 @@
+<div class="card w-50">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5>{{ listing.title }}</h5>
+        {% if user.is_authenticated %}
+            {% if isListingInWatchlist %}
+                <form action="{% url 'remove_watchlist' id=listing.id %}" method='POST'>
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Remove from watchlist</button>
+                </form>
+            {% else %}
+                <form action="{% url 'add_watchlist' id=listing.id %}" method='POST'>
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Add to watchlist</button>
+                </form>
+            {% endif %}
+            {% if isOwner and listing.active %}
+                <form action="{% url 'lose_auction' id=listing.id %}" method='POST'>
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Close Auction</button>
+                </form>
+            {% endif %}
+        {% endif %}
+    </div>
+    <img src="{{ listing.image }}" class="card-img-top" alt="Image of {{ listing.title }}">
+
+    <div class="card-body">
+        <h5 class="card-title">Price: ${{ listing.price.bid|floatformat:"2g" }}</h5>
+        <p class="card-text">{{ listing.description }}</p>
+        {% if user.is_authenticated %}
+            <form action="{% url 'add_bid' id=listing.id %}" method='POST'>
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="comment">Add Bid</label>
+                    <input type="number" class="form-control" id="bid" name="bid" min="{{listing.price.bid|add:1}}" value="{{listing.price.bid|add:1}}">
+                </div>
+                <button type="submit" class="btn btn-primary mt-2">Publish new Bid</button>
+            </form>
+        {% endif %}
+        <h5 class="card-title mt-4">Details</h5>
+        <ul class="list-group list-group-flush">
+            <li class="list-group item d-flex flex-row gap-1">
+                <strong>Created by:</strong>
+                {{ listing.owner }}
+            </li>
+            <li class="list-group item d-flex flex-row gap-1">
+                <strong>Category:</strong> 
+                {% if listing.category %} 
+                    {{ listing.category|capfirst }}
+                {% else %}
+                    no listed
+                {% endif %}
+            </li>
+            <li class="list-group item d-flex flex-row gap-1">
+                <strong>Status:</strong> 
+                {% if listing.active %}
+                    Active
+                {% else %}
+                    Closed
+                {% endif %}
+            </li>
+            <li class="list-group item d-flex flex-row gap-1">
+                <strong>Date:</strong> 
+                {{ listing.created_at|date:"F j" }} 
+            </li>
+        </ul>
+    </div>
+</div>
