@@ -30,6 +30,23 @@ class Bid(models.Model):
     def __str__(self):
         return f"{self.user} bid {self.bid} on {self.listing}"
 
+    def delete(self, *args, **kwargs):
+        listing = self.listing
+        super().delete(*args, **kwargs)
+        # Obtener la Bid más alta restante para la Listing
+        highest_bid = listing.listing_bids.order_by('-bid').first()
+        # Actualizar el precio de la Listing
+        listing.price = highest_bid
+        listing.save()
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Obtener la Bid más alta actual para la Listing
+        highest_bid = self.listing.listing_bids.order_by('-bid').first()
+        # Actualizar el precio de la Listing
+        self.listing.price = highest_bid
+        self.listing.save()
+
 
 class Listing(models.Model):
     id = models.AutoField(primary_key=True)
@@ -37,7 +54,7 @@ class Listing(models.Model):
     description = models.CharField(max_length=256)
     price = models.ForeignKey(
         Bid,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         blank=True,
         null=True,
         related_name="price_listings"
