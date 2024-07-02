@@ -59,6 +59,13 @@ class Listing(models.Model):
         blank=True,
         related_name="watchlist_listings"
     )
+    winner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        related_name="winner_listings"
+    )
     created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):

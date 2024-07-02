@@ -116,6 +116,7 @@ def listing(request, id):
     categories = Category.objects.all()
     return render(request, "auctions/listing.html", {
         "listing": listing,
+        "active": listing.active,
         "isListingInWatchlist": isListingInWatchlist,
         "comments": comments,
         "isOwner": isOwner,
@@ -211,6 +212,7 @@ def close_auction(request, id):
     listing = get_object_or_404(Listing, id=id)
     if request.user == listing.owner:
         listing.active = False
+        listing.winner = listing.price.user
         listing.save()
         message = "Auction closed successfully"
         update = True

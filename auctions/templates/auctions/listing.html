@@ -2,7 +2,7 @@
 
 {% block body %}
 
-    {% if message and listing.owner.username == user.username %}
+    {% comment %} {% if message and listing.owner.username == user.username %}
         {% if update %}
             <div class="alert alert-success" role="alert">
                 {{ message }}
@@ -12,31 +12,28 @@
                 {{ message }}
             </div>
         {% endif %}
-    {% endif %}
-            {{listing.owner.username}}
-    {% if not listing.active and user.username == listing.price.user %}
+    {% endif %} {% endcomment %}
+    {% if listing.winner == user and listing.owner != user %}
         <div>
             <div class="alert alert-success" role="alert">
                 You won the auction!
             </div>
         </div>
     {% endif %}
-
     <h2>Listing</h2>
-
     <div class="d-flex gap-3">
-        {% comment %} TODO: componentizar {% endcomment %}
-    {% include "components/listing_card.html" with listing=listing %}
-
-    <div class="d-flex flex-column w-50">
-        <h3>Comments</h3>
-        <div class="d-flex flex-column gap-3 mb-4">
-            {% for comment in comments %}
-                {% include "components/comment.html" with comment=comment %}
-            {% endfor %}
+        {% include "components/listing_card.html" with listing=listing isOwner=isOwner isListingInWatchlist=isListingInWatchlist %}
+    
+        <div class="d-flex flex-column w-50">
+            <h3>Comments</h3>
+            <div class="d-flex flex-column gap-3 mb-4">
+                {% for comment in comments %}
+                    {% include "components/comment.html" with comment=comment %}
+                {% endfor %}
+            </div>
+            {% if user.is_authenticated %}
+                {% include "components/add_comment.html" %}
+            {% endif %}
         </div>
-        {% if user.is_authenticated %}
-            {% include "components/add_comment.html" %}
-        {% endif %}
     </div>
 {% endblock %}
