@@ -101,6 +101,7 @@ class Comment(models.Model):
         on_delete=models.CASCADE,
         related_name="user_comments"
     )
+    created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return f"{self.user} commented on {self.listing}"
