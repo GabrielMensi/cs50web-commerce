@@ -16,7 +16,8 @@ def index(request):
         "auctions/index.html",
         {
             "listings": listings,
-            "categories": categories
+            "categories": categories,
+            "selected_category": None
         })
 
 
@@ -87,7 +88,14 @@ def create_listing(request):
         title = request.POST["title"]
         description = request.POST["description"]
         image = request.POST["image"]
-        category = Category.objects.get(name=request.POST["category"])
+        try:
+            category = Category.objects.get(name=request.POST["category"])
+        except Category.DoesNotExist:
+            categories = Category.objects.all()
+            return render(request, "auctions/createListing.html", {
+                "categories": categories,
+                "message": "Invalid category selected."
+            })
         owner = request.user
 
         listing = Listing(
@@ -99,7 +107,16 @@ def create_listing(request):
         )
         listing.save()
 
-        bid_amount = float(request.POST["price"])
+        try:
+            bid_amount = float(request.POST["price"])
+            if bid_amount <= 0:
+                raise ValueError("Starting price must be positive")
+        except (ValueError, KeyError):
+            categories = Category.objects.all()
+            return render(request, "auctions/createListing.html", {
+                "categories": categories,
+                "message": "Please enter a valid starting price greater than 0"
+            })
         bid = Bid(bid=bid_amount, user=owner, listing=listing)
         bid.save()
 
@@ -110,9 +127,12 @@ def create_listing(request):
 
 def listing(request, id):
     listing = get_object_or_404(Listing, id=id)
-    isListingInWatchlist = request.user in listing.watchlist.all()
+    isListingInWatchlist = (
+        request.user.is_authenticated and
+        request.user in listing.watchlist.all()
+    )
     comments = listing.listing_comments.all()
-    isOwner = request.user == listing.owner
+    isOwner = request.user.is_authenticated and request.user == listing.owner
     categories = Category.objects.all()
     return render(request, "auctions/listing.html", {
         "listing": listing,
@@ -127,16 +147,34 @@ def listing(request, id):
 def display_category(request):
     if request.method == "POST":
         category_name = request.POST["category"]
-        category = Category.objects.get(name=category_name)
-        listings = Listing.objects.filter(active=True, category=category)
         categories = Category.objects.all()
+        
+        # Handle "All Categories" option (empty value)
+        if category_name == "" or category_name is None:
+            listings = Listing.objects.filter(active=True)
+            selected_category = None
+        else:
+            try:
+                category = Category.objects.get(name=category_name)
+                listings = Listing.objects.filter(
+                    active=True, category=category
+                )
+                selected_category = category_name
+            except Category.DoesNotExist:
+                listings = Listing.objects.filter(active=True)
+                selected_category = None
+                
         return render(
             request,
             "auctions/index.html",
             {
                 "listings": listings,
-                "categories": categories
+                "categories": categories,
+                "selected_category": selected_category
             })
+    else:
+        # Handle GET requests - redirect to index page
+        return HttpResponseRedirect(reverse("index"))
 
 
 @login_required(login_url="login")
@@ -183,27 +221,46 @@ def add_comment(request, id):
 @login_required(login_url="login")
 def add_bid(request, id):
     listing = get_object_or_404(Listing, id=id)
-    bid_amount = float(request.POST["bid"])
-    if bid_amount > listing.price.bid:
-        new_bid = Bid(bid=bid_amount, user=request.user, listing=listing)
-        new_bid.save()
-        listing.price = new_bid
-        listing.save()
-        message = "Success bid"
-        update = True
-    else:
-        message = "Bid must be greater than current bid"
+    try:
+        bid_amount = float(request.POST["bid"])
+        if bid_amount <= 0:
+            raise ValueError("Bid must be positive")
+    except (ValueError, KeyError):
+        message = "Please enter a valid positive bid amount"
         update = False
+    else:
+        # Allow bids greater than current price
+        if bid_amount > listing.price.bid:
+            new_bid = Bid(bid=bid_amount, user=request.user, listing=listing)
+            new_bid.save()
+            listing.price = new_bid
+            listing.save()
+            
+            # Automatically add the listing to the user's watchlist
+            # when they make a bid
+            if request.user not in listing.watchlist.all():
+                listing.watchlist.add(request.user)
+            
+            message = "Success bid"
+            update = True
+        else:
+            message = "Bid must be greater than current bid"
+            update = False
     comments = listing.listing_comments.all()
-    isListingInWatchlist = request.user in listing.watchlist.all()
-    isOwner = request.user == listing.owner
+    isListingInWatchlist = (
+        request.user.is_authenticated and
+        request.user in listing.watchlist.all()
+    )
+    isOwner = request.user.is_authenticated and request.user == listing.owner
+    categories = Category.objects.all()
     return render(request, "auctions/listing.html", {
         "listing": listing,
         "message": message,
         "update": update,
         "comments": comments,
         "isListingInWatchlist": isListingInWatchlist,
-        "isOwner": isOwner
+        "isOwner": isOwner,
+        "categories": categories
     })
 
 
@@ -220,13 +277,18 @@ def close_auction(request, id):
         message = "Only the owner can close the auction"
         update = False
     comments = listing.listing_comments.all()
-    isListingInWatchlist = request.user in listing.watchlist.all()
-    isOwner = request.user == listing.owner
+    isListingInWatchlist = (
+        request.user.is_authenticated and
+        request.user in listing.watchlist.all()
+    )
+    isOwner = request.user.is_authenticated and request.user == listing.owner
+    categories = Category.objects.all()
     return render(request, "auctions/listing.html", {
         "listing": listing,
         "message": message,
         "update": update,
         "comments": comments,
         "isListingInWatchlist": isListingInWatchlist,
-        "isOwner": isOwner
+        "isOwner": isOwner,
+        "categories": categories
     })
