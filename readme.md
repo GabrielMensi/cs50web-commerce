@@ -1,6 +1,6 @@
 # Commerce
 
-This project is an commerce like ebay
+This project is an e-commerce auction site that will allow users to post auction listings, place bids on listings, comment on those listings, and add listings to a watchlist.
 
 ## Table of Contents
 
@@ -13,7 +13,7 @@ This project is an commerce like ebay
 
 ## Video Presentation
 
-You can see the video [Here](https://www.youtube.com/watch?v=gn7dA7vTcjg)
+You can see the video [Here](pending...)
 
 
 ## Installation
@@ -24,7 +24,7 @@ To install and set up the project, follow these steps:
 1. Clone the repository to your local machine:
 
 ```bash
-git clone https://github.com/GabrielMensi/cs50web-wiki.git
+git clone https://github.com/GabrielMensi/cs50web-commerce.git
 ```
 
 2.  Navigate to the project directory:
@@ -58,4 +58,7 @@ You must fulfill the following requirements:
     - [x]  Users who are signed in should be able to add comments to the listing page. The listing page should display all comments that have been made on the listing.
 - [x]  **Watchlist**: Users who are signed in should be able to visit a Watchlist page, which should display all of the listings that a user has added to their watchlist. Clicking on any of those listings should take the user to that listing’s page.
 - [x]  **Categories**: Users should be able to visit a page that displays a list of all listing categories. Clicking on the name of any category should take the user to a page that displays all of the active listings in that category.
-- [ ]  **Django Admin Interface**: Via the Django admin interface, a site administrator should be able to view, add, edit, and delete any listings, comments, and bids made on the site.
+- [x]  **Django Admin Interface**: Via the Django admin interface, a site administrator should be able to view, add, edit, and delete any listings, comments, and bids made on the site.
+-> Listing: create, edit, delete
+-> comments: create, delete, edit
+-> bids: create, edit, delete
