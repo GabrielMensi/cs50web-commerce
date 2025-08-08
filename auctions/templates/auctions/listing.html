@@ -1,39 +1,80 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-
-    {% comment %} {% if message and listing.owner.username == user.username %}
+    {% if message %}
         {% if update %}
-            <div class="alert alert-success" role="alert">
+            <div class="alert alert-success d-flex align-items-center" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i>
                 {{ message }}
             </div>
         {% else %}
-            <div class="alert alert-danger" role="alert">
+            <div class="alert alert-danger d-flex align-items-center" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
                 {{ message }}
             </div>
         {% endif %}
-    {% endif %} {% endcomment %}
+    {% endif %}
+    
     {% if listing.winner == user and listing.owner != user %}
-        <div>
-            <div class="alert alert-success" role="alert">
-                You won the auction!
+        <div class="alert alert-success d-flex align-items-center" role="alert">
+            <i class="bi bi-trophy-fill me-2"></i>
+            <div>
+                <strong>Congratulations!</strong> You won this auction!
             </div>
         </div>
     {% endif %}
-    <h2>Listing</h2>
-    <div class="d-flex gap-3">
-        {% include "components/listing_card.html" with listing=listing isOwner=isOwner isListingInWatchlist=isListingInWatchlist %}
     
-        <div class="d-flex flex-column w-50">
-            <h3>Comments</h3>
-            <div class="d-flex flex-column gap-3 mb-4">
-                {% for comment in comments %}
-                    {% include "components/comment.html" with comment=comment %}
-                {% endfor %}
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>
+                Auction Details
+            </h2>
+            <a href="{% url 'index' %}" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left"></i>
+                Back to Listings
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            {% include "components/listing_card.html" with listing=listing isOwner=isOwner isListingInWatchlist=isListingInWatchlist %}
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-chat-dots"></i>
+                        Comments & Discussion
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if comments %}
+                        <div class="comments-section mb-4" style="max-height: 400px; overflow-y: auto;">
+                            {% for comment in comments %}
+                                {% include "components/comment.html" with comment=comment %}
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-3">
+                            <i class="bi bi-chat text-muted" style="font-size: 2rem;"></i>
+                            <p class="text-muted mt-2">No comments yet. Be the first to comment!</p>
+                        </div>
+                    {% endif %}
+                    
+                    {% if user.is_authenticated %}
+                        {% include "components/add_comment.html" %}
+                    {% else %}
+                        <div class="text-center">
+                            <a href="{% url 'login' %}" class="btn btn-outline-primary">
+                                <i class="bi bi-box-arrow-in-right"></i>
+                                Login to comment
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
-            {% if user.is_authenticated %}
-                {% include "components/add_comment.html" %}
-            {% endif %}
         </div>
     </div>
 {% endblock %}

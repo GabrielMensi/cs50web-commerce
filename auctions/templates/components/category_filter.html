@@ -1,0 +1,33 @@
+<div class="filter-section mb-4">
+    <div class="card">
+        <div class="card-body py-3">
+            <div class="row align-items-center justify-content-between g-3">
+                <div class="col-md-4">
+                    <h6 class="mb-0">
+                        <i class="bi bi-funnel"></i>
+                        Filter by Category
+                    </h6>
+                </div>
+                <div class="col-md-8">
+                    <form action="{% url 'display_category' %}" method="POST" class="d-flex gap-2">
+                        {% csrf_token %}
+                        <div class="form-floating flex-grow-1">
+                            <select class="form-select" id="categoryFilter" name="category" onchange="this.form.submit()">
+                                <option value="" {% if not selected_category %}selected{% endif %}>All Categories</option>
+                                {% for category in categories %}
+                                    <option value="{{ category }}" {% if selected_category == category.name %}selected{% endif %}>
+                                        {{ category|capfirst }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <label for="categoryFilter">
+                                <i class="bi bi-tag"></i>
+                                Choose Category
+                            </label>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

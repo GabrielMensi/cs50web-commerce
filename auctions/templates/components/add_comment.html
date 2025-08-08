@@ -1,8 +1,17 @@
-<form action="{% url 'add_comment' id=listing.id %}" method='POST'>
-    {% csrf_token %}
-    <div class="form-group">
-        <label for="comment">Add comment</label>
-        <textarea class="form-control" id="comment" name="comment" rows="3"></textarea>
-    </div>
-    <button type="submit" class="btn btn-primary mt-2">Add comment</button>
-</form>
+<div class="add-comment-section">
+    <form action="{% url 'add_comment' id=listing.id %}" method='POST'>
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="comment" class="form-label">
+                <i class="bi bi-chat-square-text"></i>
+                Add your comment
+            </label>
+            <textarea class="form-control" id="comment" name="comment" rows="3" 
+                      placeholder="Share your thoughts about this listing..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-send"></i>
+            Post Comment
+        </button>
+    </form>
+</div>

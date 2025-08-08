@@ -1,59 +1,113 @@
-<form action="{% url 'create_listing' %}" method="POST" class="w-50">
-    {% csrf_token %}
-    <div class="form-floating mb-3">
-        <input 
-            id="floatingInput" 
-            class="form-control" 
-            type="text"
-            name="title"
-            placeholder="Title"
-            required>
-        <label for="title">Title</label>
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="bi bi-file-earmark-plus"></i>
+            Listing Details
+        </h5>
     </div>
+    <div class="card-body">
+        <form action="{% url 'create_listing' %}" method="POST">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                        <input 
+                            id="title" 
+                            class="form-control" 
+                            type="text"
+                            name="title"
+                            placeholder="Title"
+                            required>
+                        <label for="title">
+                            <i class="bi bi-card-heading"></i>
+                            Listing Title
+                        </label>
+                    </div>
 
-    <div class="form-floating mb-3">
-        <input 
-            id="floatingInput" 
-            class="form-control" 
-            type="text"
-            name="description"
-            placeholder="Description"
-            required>
-        <label for="description">Description</label>
+                    <div class="form-floating mb-3">
+                        <input 
+                            id="image" 
+                            class="form-control" 
+                            type="url"
+                            name="image"
+                            placeholder="Image URL"
+                            required>
+                        <label for="image">
+                            <i class="bi bi-image"></i>
+                            Image URL
+                        </label>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input 
+                            id="price" 
+                            class="form-control" 
+                            type="number"
+                            step="0.01"
+                            name="price"
+                            placeholder="Starting Price"
+                            min="0.01"
+                            required>
+                        <label for="price">
+                            <i class="bi bi-currency-dollar"></i>
+                            Starting Price ($)
+                        </label>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <select class="form-select" id="category" name="category">
+                            <option value="">Select a category</option>
+                            {% for category in categories %}
+                                <option value="{{ category }}">{{ category }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="category">
+                            <i class="bi bi-tag"></i>
+                            Category (Optional)
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                        <textarea 
+                            id="description" 
+                            class="form-control" 
+                            name="description"
+                            placeholder="Description"
+                            style="height: 200px;"
+                            required></textarea>
+                        <label for="description">
+                            <i class="bi bi-file-text"></i>
+                            Description
+                        </label>
+                    </div>
+
+                    <div class="bg-light bg-opacity-10 p-3 rounded">
+                        <h6 class="text-primary mb-2">
+                            <i class="bi bi-info-circle"></i>
+                            Listing Tips
+                        </h6>
+                        <ul class="text-muted small mb-0">
+                            <li>Use a clear, descriptive title</li>
+                            <li>Provide a detailed description</li>
+                            <li>Set a competitive starting price</li>
+                            <li>Use high-quality images</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 justify-content-end mt-4">
+                <a href="{% url 'index' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i>
+                    Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i>
+                    Create Listing
+                </button>
+            </div>
+        </form>
     </div>
-
-    <div class="form-floating mb-3">
-        <input 
-            id="floatingInput" 
-            class="form-control" 
-            type="url"
-            name="image"
-            placeholder="Image URL"
-            required>
-        <label for="image">Image URL</label>
-    </div>
-
-    <div class="form-floating mb-3">
-        <input 
-            id="floatingInput" 
-            class="form-control" 
-            type="number"
-            name="price"
-            placeholder="Price"
-            required>
-        <label for="price">Price</label>
-    </div>
-
-    <div class="form-group">
-        <div class="form-floating">
-            <select class="form-select" id="floatingSelect" name="category">
-            {% for category in categories %}
-                <option value="{{ category }}">{{ category }}</option>
-            {% endfor %}
-            </select>
-            <label for="floatingSelect">Categories</label>
-        </div>
-    </div>
-
-    <button type="submit" class="btn btn-primary mt-3">Submit</button>
-</form>
+</div>

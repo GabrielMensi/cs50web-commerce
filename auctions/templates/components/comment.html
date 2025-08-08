@@ -1,6 +1,15 @@
-<div class="card-body">
-    <div class="card ">
-        <div class="card-header"><p>By: {{ comment.user }}</p></div>
-        <div class="card-body"><p>{{ comment.comment }}</p></div>
+<div class="comment-item mb-3">
+    <div class="card border-0 bg-transparent">
+        <div class="card-body p-3" style="background: rgba(79, 143, 255, 0.05); border-radius: 12px; border-left: 3px solid var(--accent-blue);">
+            <div class="d-flex align-items-center mb-2">
+                <i class="bi bi-person-circle text-primary me-2"></i>
+                <strong class="text-primary">{{ comment.user }}</strong>
+                <small class="text-muted ms-auto">
+                    <i class="bi bi-clock"></i>
+                    {{ comment.created_at|timesince }} ago
+                </small>
+            </div>
+            <p class="mb-0 text-secondary">{{ comment.comment }}</p>
+        </div>
     </div>
 </div>

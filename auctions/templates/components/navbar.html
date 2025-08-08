@@ -1,49 +1,67 @@
-<nav class="navbar navbar-expand-lg">
+<nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-center">
                 <li class="nav-item">
-                    <a class="nav-link active --brand" href="{% url 'index' %}"><strong>AUCTIONS</strong></a>
+                    <a class="nav-link --brand" href="{% url 'index' %}">
+                        <strong>AUCTIONS</strong>
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="{% url 'index' %}">Active Listings</a>
+                    <a class="nav-link" href="{% url 'index' %}">
+                        <i class="bi bi-grid-3x3-gap"></i>
+                        Active Listings
+                    </a>
                 </li>
                 {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link active" href="{% url 'create_listing' %}">Create Listing</a>
+                        <a class="nav-link" href="{% url 'create_listing' %}">
+                            <i class="bi bi-plus-circle"></i>
+                            Create Listing
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="{% url 'watchlist' %}">Watchlist</a>
-                    </li>
-                    <li class="nav-item">
-                        <p class="nav-link --username">Signed in as: <strong>{{ user.username|capfirst }}</strong></p>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active --logout" href="{% url 'logout' %}">Log Out</a>
-                    </li>
-                {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{% url 'login' %}">Log In</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{% url 'register' %}">Register</a>
+                        <a class="nav-link" href="{% url 'watchlist' %}">
+                            <i class="bi bi-bookmark-heart"></i>
+                            Watchlist
+                        </a>
                     </li>
                 {% endif %}
             </ul>
-            <form action="{% url 'display_category' %}" method="POST" class="d-flex" role="search">
-                {% csrf_token %}
-                <div class="form-group" style="min-width: 135px;">
-                    <div class="form-floating me-2">
-                        <select class="form-select" id="floatingSelect" name="category">
-                        {% for category in categories %}
-                            <option value="{{ category }}">{{ category }}</option>
-                        {% endfor %}
-                        </select>
-                        <label for="floatingSelect">Categories</label>
+            
+            <div class="d-flex align-items-center gap-3">
+                {% if user.is_authenticated %}
+                    <div class="nav-item">
+                        <span class="nav-link --username">
+                            <i class="bi bi-person-circle"></i>
+                            <strong>{{ user.username|capfirst }}</strong>
+                        </span>
                     </div>
-                </div>
-                <button type="submit" class="btn btn-outline-success">Filter</button>
-            </form>                
+                    <div class="nav-item">
+                        <a class="nav-link --logout" href="{% url 'logout' %}">
+                            <i class="bi bi-box-arrow-right"></i>
+                            Log Out
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">
+                            <i class="bi bi-box-arrow-in-right"></i>
+                            Log In
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a class="nav-link" href="{% url 'register' %}">
+                            <i class="bi bi-person-plus"></i>
+                            Register
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 </nav>
