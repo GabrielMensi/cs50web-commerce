@@ -98,18 +98,9 @@ def create_listing(request):
             })
         owner = request.user
 
-        listing = Listing(
-            title=title,
-            description=description,
-            image=image,
-            category=category,
-            owner=owner
-        )
-        listing.save()
-
         try:
-            bid_amount = float(request.POST["price"])
-            if bid_amount <= 0:
+            starting_price = float(request.POST["price"])
+            if starting_price <= 0:
                 raise ValueError("Starting price must be positive")
         except (ValueError, KeyError):
             categories = Category.objects.all()
@@ -117,10 +108,15 @@ def create_listing(request):
                 "categories": categories,
                 "message": "Please enter a valid starting price greater than 0"
             })
-        bid = Bid(bid=bid_amount, user=owner, listing=listing)
-        bid.save()
 
-        listing.price = bid
+        listing = Listing(
+            title=title,
+            description=description,
+            starting_price=starting_price,
+            image=image,
+            category=category,
+            owner=owner
+        )
         listing.save()
         return HttpResponseRedirect(reverse("index"))
 
@@ -148,7 +144,7 @@ def display_category(request):
     if request.method == "POST":
         category_name = request.POST["category"]
         categories = Category.objects.all()
-        
+
         # Handle "All Categories" option (empty value)
         if category_name == "" or category_name is None:
             listings = Listing.objects.filter(active=True)
@@ -163,7 +159,7 @@ def display_category(request):
             except Category.DoesNotExist:
                 listings = Listing.objects.filter(active=True)
                 selected_category = None
-                
+
         return render(
             request,
             "auctions/index.html",
@@ -230,21 +226,19 @@ def add_bid(request, id):
         update = False
     else:
         # Allow bids greater than current price
-        if bid_amount > listing.price.bid:
+        if bid_amount > listing.current_price:
             new_bid = Bid(bid=bid_amount, user=request.user, listing=listing)
             new_bid.save()
-            listing.price = new_bid
-            listing.save()
-            
+
             # Automatically add the listing to the user's watchlist
             # when they make a bid
             if request.user not in listing.watchlist.all():
                 listing.watchlist.add(request.user)
-            
+
             message = "Success bid"
             update = True
         else:
-            message = "Bid must be greater than current bid"
+            message = f"Bid must be greater than current price of ${listing.current_price}"
             update = False
     comments = listing.listing_comments.all()
     isListingInWatchlist = (
@@ -269,7 +263,10 @@ def close_auction(request, id):
     listing = get_object_or_404(Listing, id=id)
     if request.user == listing.owner:
         listing.active = False
-        listing.winner = listing.price.user
+        # Only set winner if there are actual bids
+        if listing.price:  # If there are bids
+            listing.winner = listing.price.user
+        # If no bids, winner remains None
         listing.save()
         message = "Auction closed successfully"
         update = True
