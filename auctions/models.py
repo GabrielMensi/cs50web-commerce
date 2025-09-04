@@ -40,10 +40,14 @@ class Bid(models.Model):
         listing.save()
 
     def save(self, *args, **kwargs):
+        # Only validate for new bids (not updates), and only for active listings
+        if self.pk is None and self.listing.active:  # New bid on active listing
+            if self.bid <= self.listing.current_price:
+                raise ValueError(f"Bid must be higher than current price of {self.listing.current_price}")
+        
         super().save(*args, **kwargs)
-        # Obtener la Bid más alta actual para la Listing
+        # Update the listing's price to point to the highest bid
         highest_bid = self.listing.listing_bids.order_by('-bid').first()
-        # Actualizar el precio de la Listing
         self.listing.price = highest_bid
         self.listing.save()
 
@@ -52,6 +56,7 @@ class Listing(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=64)
     description = models.CharField(max_length=256)
+    starting_price = models.DecimalField(max_digits=10, decimal_places=2)
     price = models.ForeignKey(
         Bid,
         on_delete=models.SET_NULL,
@@ -84,6 +89,18 @@ class Listing(models.Model):
         related_name="winner_listings"
     )
     created_at = models.DateTimeField(default=timezone.now)
+
+    @property
+    def current_price(self):
+        """Returns the current price - either highest bid amount or starting price"""
+        if self.price:  # If there are bids
+            return self.price.bid
+        return self.starting_price
+    
+    @property
+    def highest_bid(self):
+        """Returns the highest bid object or None"""
+        return self.listing_bids.order_by('-bid').first()
 
     def __str__(self):
         return self.title
