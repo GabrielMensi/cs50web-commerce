@@ -13,7 +13,7 @@
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
             {% for listing in listings %}
                 <div class="col">
-                    {% include "components/card.html" with image=listing.image title=listing.title category=listing.category description=listing.description price=listing.price id=listing.id %}
+                    {% include "components/card.html" with listing=listing %}
                 </div>
             {% endfor %}
         </div>
