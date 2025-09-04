@@ -22,6 +22,7 @@
 }
 
 .filter-section .form-select {
+    padding-bottom: 0;
     cursor: pointer;
 }
 
