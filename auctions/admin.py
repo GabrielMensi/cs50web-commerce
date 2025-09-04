@@ -13,31 +13,21 @@ class BidInline(admin.StackedInline):
 class ListingAdmin(admin.ModelAdmin):
     list_display = (
         'title',
-        'description',
+        'description', 
         'category',
         'owner',
-        'price',
+        'starting_price',
+        'current_price',
         'active'
     )
+    readonly_fields = ('price', 'current_price')
+    exclude = ('price',)  # Hide the FK price field - it's auto-managed
     inlines = [BidInline]
-
-    def save_related(self, request, form, formsets, change):
-        super().save_related(request, form, formsets, change)
-        for formset in formsets:
-            if formset.model == Bid:
-                for form in formset:
-                    bid = form.save(commit=False)
-                    if not bid.listing:
-                        bid.listing = form.instance
-                    bid.save()
-                form.instance.price = formset.instance
-                form.instance.save()
-
-    def get_form(self, request, obj=None, **kwargs):
-        form = super().get_form(request, obj, **kwargs)
-        if obj is None:  # Es un nuevo objeto, excluye el campo price
-            form.base_fields['price'].widget = forms.HiddenInput()
-        return form
+    
+    def current_price(self, obj):
+        """Show current price in admin list"""
+        return obj.current_price
+    current_price.short_description = 'Current Price'
 
 
 admin.site.register(User)
