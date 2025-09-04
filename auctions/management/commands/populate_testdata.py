@@ -11,21 +11,23 @@ User = get_user_model()
 class Command(BaseCommand):
     help = 'Populate the database with test data for the auction site'
 
-    def add_arguments(self, parser):
-        parser.add_argument(
-            '--clear',
-            action='store_true',
-            help='Clear existing data before populating',
-        )
-
     def handle(self, *args, **options):
-        if options['clear']:
-            self.stdout.write('Clearing existing data...')
-            Comment.objects.all().delete()
-            Bid.objects.all().delete()
-            Listing.objects.all().delete()
-            Category.objects.all().delete()
-            User.objects.filter(is_superuser=False).delete()
+        # Create superuser first
+        self.stdout.write('Creating superuser...')
+        admin_user, created = User.objects.get_or_create(
+            username='admin',
+            defaults={
+                'email': 'admin@example.com',
+                'is_staff': True,
+                'is_superuser': True
+            }
+        )
+        if created:
+            admin_user.set_password('testpass123')
+            admin_user.save()
+            self.stdout.write(f'Created superuser: {admin_user.username}')
+        else:
+            self.stdout.write(f'Superuser already exists: {admin_user.username}')
 
         # Create categories
         categories_data = [
@@ -153,7 +155,7 @@ class Command(BaseCommand):
                 'title': 'Handmade Ceramic Vase',
                 'description': 'Unique ceramic vase by local artist.',
                 'starting_price': Decimal('45.00'),
-                'image': 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500',  # noqa
+                'image': 'https://images.unsplash.com/photo-1608110546381-a29025c9e878?q=80&w=500',  # noqa
                 'category': 'Home & Garden',
                 'owner': 'diana',
                 'active': True
@@ -167,6 +169,7 @@ class Command(BaseCommand):
                 owner=users[listing_data['owner']],
                 defaults={
                     'description': listing_data['description'],
+                    'starting_price': listing_data['starting_price'],
                     'image': listing_data['image'],
                     'category': categories[listing_data['category']],
                     'active': listing_data['active']
@@ -174,14 +177,6 @@ class Command(BaseCommand):
             )
 
             if created:
-                # Create initial bid (starting price) from owner
-                initial_bid = Bid.objects.create(
-                    bid=listing_data['starting_price'],
-                    user=listing.owner,
-                    listing=listing
-                )
-                listing.price = initial_bid
-                listing.save()
                 self.stdout.write(f'Created listing: {listing.title}')
             else:
                 self.stdout.write(f'Listing already exists: {listing.title}')
@@ -317,6 +312,7 @@ class Command(BaseCommand):
             {'user': 'bob', 'listing_title': 'Gaming Laptop - ASUS ROG'},
             {'user': 'bob', 'listing_title': 'Antique Chess Set'},
             {'user': 'charlie', 'listing_title': 'Designer Leather Jacket'},
+            {'user': 'charlie', 'listing_title': 'Vintage iPhone 12'},
             {'user': 'diana', 'listing_title': 'Vintage iPhone 12'},
         ]
 
@@ -333,8 +329,10 @@ class Command(BaseCommand):
                 '1. Visit http://localhost:8000 to see active listings\n'
                 '2. Login with test users (alice, bob, charlie, diana) '
                 'using password: testpass123\n'
-                '3. Test bidding, watchlist, and commenting features\n'
-                '4. Access admin at http://localhost:8000/admin/ '
-                'if you have a superuser account'
+                '3. Login as admin (username: admin, password: admin123) '
+                'for superuser access\n'
+                '4. Test bidding, watchlist, and commenting features\n'
+                '5. Access admin panel at http://localhost:8000/admin/ '
+                'with the admin account'
             )
         )
