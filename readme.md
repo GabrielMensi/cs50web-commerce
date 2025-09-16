@@ -7,40 +7,179 @@ This project is an e-commerce auction site that will allow users to post auction
 - [Commerce](#commerce)
   - [Table of Contents](#table-of-contents)
   - [Video Presentation](#video-presentation)
+  - [Features](#features)
   - [Installation](#installation)
+  - [Quick Start with Test Data](#quick-start-with-test-data)
   - [Usage](#usage)
+  - [Test Accounts](#test-accounts)
+  - [Development](#development)
   - [Specification](#specification)
 
 ## Video Presentation
 
-You can see the video [Here](pending...)
+You can see the video [Here](https://youtu.be/1iQOUcSqI1I)
 
+## Features
+
+- User authentication (register, login, logout)
+- Create auction listings with images and categories
+- Place bids on active auctions
+- Add/remove items from personal watchlist
+- Comment on auction listings
+- Close auctions (listing owners only)
+- Browse by categories
+- Admin interface for site management
 
 ## Installation
 
-
 To install and set up the project, follow these steps:
 
-1. Clone the repository to your local machine:
+### Prerequisites
+
+- Python 3.8 or higher
+- pip (Python package manager)
+
+### Setup Instructions
+
+1. **Clone the repository to your local machine:**
 
 ```bash
 git clone https://github.com/GabrielMensi/cs50web-commerce.git
 ```
 
-2.  Navigate to the project directory:
+2. **Navigate to the project directory:**
 
 ```bash
 cd cs50web-commerce
 ```
 
-1.   Install the requirements
+3. **Create a virtual environment (recommended):**
+
+```bash
+python -m venv .venv
+```
+
+4. **Activate the virtual environment:**
+
+On Linux/macOS:
+```bash
+source .venv/bin/activate
+```
+
+On Windows:
+```bash
+.venv\Scripts\activate
+```
+
+5. **Install the required dependencies:**
+
+```bash
+pip install -r requirements.txt
+```
+
+6. **Apply database migrations:**
+
+```bash
+python manage.py migrate
+```
+
+7. **Create a superuser account (optional, for admin access):**
+
+```bash
+python manage.py createsuperuser
+```
+
+## Quick Start with Test Data
+
+For a quick demonstration of the auction site with sample data, use the provided test data script:
+
+### Automatic Setup with Test Data
+
+```bash
+# Make the script executable (Linux/macOS only)
+chmod +x reset_testdata.sh
+
+# Run the script
+./reset_testdata.sh
+```
+
+This script will:
+- Remove any existing database
+- Create a fresh database with migrations
+- Populate the site with sample auction listings, categories, bids, and comments
+- Create test user accounts
+
+### Manual Test Data Setup
+
+If you prefer to set up test data manually:
+
+```bash
+# Reset the database
+rm db.sqlite3  # Remove existing database (if any)
+python manage.py migrate
+
+# Populate with test data
+python manage.py populate_testdata
+```
 
 ## Usage
 
-1. Run the project:
+1. **Start the development server:**
 
 ```bash
 python manage.py runserver
+```
+
+2. **Open your web browser and navigate to:**
+   - Main site: http://localhost:8000
+   - Admin interface: http://localhost:8000/admin/
+
+## Test Accounts
+
+After running the test data setup, you can use these pre-created accounts:
+
+| Username | Password | Role |
+|----------|----------|------|
+| alice | testpass123 | Regular user |
+| bob | testpass123 | Regular user |
+| charlie | testpass123 | Regular user |
+| diana | testpass123 | Regular user |
+| admin | testpass123 | Superuser (admin access) |
+
+## Development
+
+### Project Structure
+
+```
+commerce/
+├── auctions/           # Main application
+│   ├── models.py      # Database models
+│   ├── views.py       # View functions
+│   ├── urls.py        # URL routing
+│   ├── forms.py       # Django forms
+│   └── templates/     # HTML templates
+├── commerce/          # Django project settings
+├── requirements.txt   # Python dependencies
+└── manage.py         # Django management script
+```
+
+### Key Commands
+
+```bash
+# Run development server
+python manage.py runserver
+
+# Create new migrations after model changes
+python manage.py makemigrations
+
+# Apply migrations
+python manage.py migrate
+
+# Access Django shell
+python manage.py shell
+
+# Reset and repopulate test data
+./reset_testdata.sh
 ```
 
 ## Specification
